@@ -42,6 +42,14 @@ const twitch = new tmi.client({
   channels: db.get('channels').value()
 })
 
+twitch.on('join', (channel, user, self) => {
+  if (self) bot.createMessage(process.env.DISCORD_CHANNEL, `Joined ${channel}`)
+})
+
+twitch.on('part', (channel, user, self) => {
+  if (self) bot.createMessage(process.env.DISCORD_CHANNEL, `Left ${channel}`)
+})
+
 twitch.on('chat', (channel, user, message, self) => {
   bot.createMessage(process.env.DISCORD_CHANNEL,
     `[${channel}] <${user['display-name']}> ${message}`)
@@ -50,10 +58,6 @@ twitch.on('chat', (channel, user, message, self) => {
 twitch.on('action', (channel, user, message, self) => {
   bot.createMessage(process.env.DISCORD_CHANNEL,
     `[${channel}] **${user['display-name']}** ${message}`)
-})
-
-bot.on('ready', () => {
-  console.log('Ready!')
 })
 
 bot.registerCommand('ping', 'Pong!', {
@@ -73,14 +77,12 @@ bot.registerCommand('join', (msg, args) => {
 
   sanitizeChannelList(args).forEach(chan => {
     if (twitch.getChannels().includes(chan)) {
-      bot.createMessage(process.env.DISCORD_CHANNEL,
-        `Already connected to ${chan}`)
+      bot.createMessage(process.env.DISCORD_CHANNEL, `I am already in ${chan}`)
       return
     }
 
     twitch.join(chan).then(data => {
       db.get('channels').push(chan).write()
-      bot.createMessage(process.env.DISCORD_CHANNEL, `Joined ${chan}`)
     }).catch(err => {
       bot.createMessage(process.env.DISCORD_CHANNEL, `${err}`)
     })
@@ -94,14 +96,12 @@ bot.registerCommand('part', (msg, args) => {
 
   sanitizeChannelList(args).forEach(chan => {
     if (!twitch.getChannels().includes(chan)) {
-      bot.createMessage(process.env.DISCORD_CHANNEL,
-        `Not connected to ${chan}`)
+      bot.createMessage(process.env.DISCORD_CHANNEL, `I am not in ${chan}`)
       return
     }
 
     twitch.part(chan).then(data => {
       db.get('channels').remove(chan).write()
-      bot.createMessage(process.env.DISCORD_CHANNEL, `Left ${chan}`)
     }).catch(err => {
       bot.createMessage(process.env.DISCORD_CHANNEL, `${err}`)
     })
@@ -110,5 +110,9 @@ bot.registerCommand('part', (msg, args) => {
   description: "Leave a twitch channel's chat",
 })
 
+bot.on('ready', () => {
+  console.log('Ready!')
+  twitch.connect()
+})
+
 bot.connect()
-twitch.connect()
