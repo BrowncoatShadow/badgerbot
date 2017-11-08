@@ -3,7 +3,7 @@
   "scripts": {
     "start": "forever start bot.js",
     "stop": "forever stop bot.js",
-    "dev": "node bot.js"
+    "dev": "nodemon bot.js"
   },
   "dependencies": {
     "dotenv": "^4.0.0",
@@ -11,5 +11,11 @@
     "forever": "^0.15.3",
     "lowdb": "^1.0.0",
     "tmi.js": "^1.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
+  },
+  "nodemonConfig": {
+    "ignore": ["db.json"]
   }
 }
