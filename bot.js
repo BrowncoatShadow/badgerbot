@@ -1,8 +1,8 @@
+require('dotenv').config()
 const Eris = require('eris');
 const tmi = require("tmi.js");
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync')
-const mkdirp = require('mkdirp');
 
 function sanitizeChannelList (arr) {
   var list = []
@@ -17,15 +17,14 @@ function sanitizeChannelList (arr) {
   return list.filter((a, b) => list.indexOf(a) === b)
 }
 
-mkdirp.sync('.data')
-const db = low(new FileSync('.data/db.json'))
+const db = low(new FileSync('db.json'))
 db.defaults({ channels: [] }).write()
 
 const bot = new Eris.CommandClient(process.env.DISCORD_TOKEN, {}, {
   description: "I do things that make Sems happy.",
   name: '<Badgerbot>',
   owner: 'BrowncoatShadow',
-  prefix: process.env.PREFIX
+  prefix: (process.env.NODE_ENV === 'production') ? '.' : ','
 })
 
 const twitch = new tmi.client({

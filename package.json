@@ -1,16 +1,15 @@
 {
   "private": true,
   "scripts": {
-    "start": "node bot.js",
-    "dev": "node -r dotenv/config bot.js"
+    "start": "forever start bot.js",
+    "stop": "forever stop bot.js",
+    "dev": "node bot.js"
   },
   "dependencies": {
+    "dotenv": "^4.0.0",
     "eris": "^0.8.1",
+    "forever": "^0.15.3",
     "lowdb": "^1.0.0",
-    "mkdirp": "^0.5.1",
     "tmi.js": "^1.2.1"
-  },
-  "devDependencies": {
-    "dotenv": "^4.0.0"
   }
 }
