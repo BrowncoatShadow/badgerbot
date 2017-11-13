@@ -125,6 +125,18 @@ bot.registerCommand('list', () => {
   fullDescription: "List all the twitch channel chats being watched and relayed to discord"
 })
 
+bot.registerCommand('purge', (msg, args) => {
+  bot.purgeChannel(process.env.DISCORD_CHANNEL, -1)
+}, {
+  description: "Purge messages in channel",
+  fullDescription: "Purge 2 weeks worth of messages in the Discord channel that contains relayed twitch chat",
+  requirements: {
+    permissions: {
+      administrator: true
+    }
+  }
+})
+
 bot.on('ready', () => {
   console.log('Ready!')
   client.connect()
