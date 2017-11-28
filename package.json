@@ -1,9 +1,11 @@
 {
   "private": true,
+  "main": "bot.js",
   "scripts": {
-    "start": "forever start bot.js",
-    "stop": "forever stop bot.js",
-    "dev": "nodemon bot.js"
+    "start": "forever start $npm_package_main",
+    "stop": "forever stop $npm_package_main",
+    "dev": "nodemon",
+    "test": "standard --verbose | snazzy"
   },
   "dependencies": {
     "dotenv": "^4.0.0",
@@ -13,9 +15,13 @@
     "tmi.js": "^1.2.1"
   },
   "devDependencies": {
-    "nodemon": "^1.12.1"
+    "nodemon": "^1.12.1",
+    "snazzy": "^7.0.0",
+    "standard": "^10.0.3"
   },
   "nodemonConfig": {
-    "ignore": ["db.json"]
+    "ignore": [
+      "db.json"
+    ]
   }
 }

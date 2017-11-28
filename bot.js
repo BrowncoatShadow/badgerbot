@@ -27,8 +27,7 @@ const bot = new Eris.CommandClient(process.env.DISCORD_TOKEN, {}, {
   prefix: (process.env.NODE_ENV === 'production') ? '.' : ','
 })
 
-// eslint-disable-next-line new-cap
-const client = new tmi.client({
+const client = new tmi.client({ // eslint-disable-line new-cap
   options: {
     debug: (process.env.NODE_ENV !== 'production')
   },
