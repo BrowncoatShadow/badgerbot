@@ -1,7 +1,7 @@
 require('dotenv').config()
-const Eris = require('eris');
-const tmi = require("tmi.js");
-const low = require('lowdb');
+const Eris = require('eris')
+const tmi = require('tmi.js')
+const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
 
 function sanitizeChannelList (arr) {
@@ -21,18 +21,19 @@ const db = low(new FileSync('db.json'))
 db.defaults({ channels: [] }).write()
 
 const bot = new Eris.CommandClient(process.env.DISCORD_TOKEN, {}, {
-  description: "I do things that make Sems happy.",
+  description: 'I do things that make Sems happy.',
   name: '<Badgerbot>',
   owner: 'BrowncoatShadow',
   prefix: (process.env.NODE_ENV === 'production') ? '.' : ','
 })
 
+// eslint-disable-next-line new-cap
 const client = new tmi.client({
   options: {
-    debug: (process.env.NODE_ENV === 'production') ? false : true
+    debug: (process.env.NODE_ENV !== 'production')
   },
   connection: {
-    cluster: "aws",
+    cluster: 'aws',
     reconnect: true
   },
   identity: {
@@ -80,8 +81,8 @@ bot.registerCommand('join', (msg, args) => {
     })
   })
 }, {
-  description: "Join a twitch channel's chat",
-  fullDescription: "Join a twitch channel's chat and relay it to discord",
+  description: 'Join a twitch channel\'s chat',
+  fullDescription: 'Join a twitch channel\'s chat and relay it to discord',
   usage: '<channel>...',
   argsRequired: true,
   requirements: {
@@ -105,8 +106,8 @@ bot.registerCommand('part', (msg, args) => {
     })
   })
 }, {
-  description: "Leave a twitch channel's chat",
-  fullDescription: "Leave a twitch channel's chat and stop relaying it to discord",
+  description: 'Leave a twitch channel\'s chat',
+  fullDescription: 'Leave a twitch channel\'s chat and stop relaying it to discord',
   usage: '<channel>...',
   argsRequired: true,
   requirements: {
@@ -121,15 +122,15 @@ bot.registerCommand('list', () => {
   if (list.length === 0) return 'I am not watching any twitch chats.'
   return 'Watching: ' + list.join(', ')
 }, {
-  description: "List twitch channels being watched",
-  fullDescription: "List all the twitch channel chats being watched and relayed to discord"
+  description: 'List twitch channels being watched',
+  fullDescription: 'List all the twitch channel chats being watched and relayed to discord'
 })
 
 bot.registerCommand('purge', (msg, args) => {
   bot.purgeChannel(process.env.DISCORD_CHANNEL, -1)
 }, {
-  description: "Purge messages in channel",
-  fullDescription: "Purge 2 weeks worth of messages in the Discord channel that contains relayed twitch chat",
+  description: 'Purge messages in channel',
+  fullDescription: 'Purge 2 weeks worth of messages in the Discord channel that contains relayed twitch chat',
   requirements: {
     permissions: {
       administrator: true
