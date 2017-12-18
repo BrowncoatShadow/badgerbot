@@ -1,9 +1,11 @@
 require('dotenv').config()
 const Eris = require('eris')
 const tmi = require('tmi.js')
+const TwitchPS = require('twitchps')
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
 
+// Return a sanitized version of a list of channel names.
 function sanitizeChannelList (arr) {
   var list = []
 
@@ -17,9 +19,15 @@ function sanitizeChannelList (arr) {
   return list.filter((a, b) => list.indexOf(a) === b)
 }
 
+// Return the channel as a PubSub topic.
+function channelTopic (chan) {
+  return {topic: `video-playback.${chan.replace(/^#/g, '')}`}
+}
+
 const db = low(new FileSync('db.json'))
 db.defaults({ channels: [] }).write()
 
+// Main discord bot.
 const bot = new Eris.CommandClient(process.env.DISCORD_TOKEN, {}, {
   description: 'I do things that make Sems happy.',
   name: '<Badgerbot>',
@@ -27,6 +35,7 @@ const bot = new Eris.CommandClient(process.env.DISCORD_TOKEN, {}, {
   prefix: (process.env.NODE_ENV === 'production') ? '.' : ','
 })
 
+// Twitch chat client that watches chat channels.
 const client = new tmi.client({ // eslint-disable-line new-cap
   options: {
     debug: (process.env.NODE_ENV !== 'production')
@@ -42,12 +51,34 @@ const client = new tmi.client({ // eslint-disable-line new-cap
   channels: db.get('channels').value()
 })
 
+// Twich PubSub client to capture streaming start/end events.
+// Twitch requires at least one topic to establish a connection, connect with a
+// default topic then immedately remove it.
+var defaultTopic = [channelTopic('twitch')]
+const ps = new TwitchPS({
+  init_topics: defaultTopic,
+  reconnect: true,
+  debug: (process.env.NODE_ENV !== 'production')
+})
+// Remove the default PubSub topic.
+ps.removeTopic(defaultTopic)
+
+ps.on('stream-up', (data) => {
+  bot.createMessage(process.env.DISCORD_CHANNEL,
+    `#${data.channel_name} has started streaming!`)
+})
+
+ps.on('stream-down', (data) => {
+  bot.createMessage(process.env.DISCORD_CHANNEL,
+    `#${data.channel_name} has stopped streaming.`)
+})
+
 client.on('join', (channel, user, self) => {
-  if (self) bot.createMessage(process.env.DISCORD_CHANNEL, `Joined ${channel}`)
+  if (self) bot.createMessage(process.env.DISCORD_CHANNEL, `Joined ${channel}.`)
 })
 
 client.on('part', (channel, user, self) => {
-  if (self) bot.createMessage(process.env.DISCORD_CHANNEL, `Left ${channel}`)
+  if (self) bot.createMessage(process.env.DISCORD_CHANNEL, `Left ${channel}.`)
 })
 
 client.on('chat', (channel, user, message, self) => {
@@ -74,6 +105,7 @@ bot.registerCommand('join', (msg, args) => {
     }
 
     client.join(chan).then(data => {
+      ps.addTopic([channelTopic(chan)])
       db.get('channels').push(chan).write()
     }).catch(err => {
       bot.createMessage(process.env.DISCORD_CHANNEL, `${err}`)
@@ -99,6 +131,7 @@ bot.registerCommand('part', (msg, args) => {
     }
 
     client.part(chan).then(data => {
+      ps.removeTopic([channelTopic(chan)])
       db.get('channels').remove(chan).write()
     }).catch(err => {
       bot.createMessage(process.env.DISCORD_CHANNEL, `${err}`)
@@ -140,6 +173,7 @@ bot.registerCommand('purge', (msg, args) => {
 bot.on('ready', () => {
   console.log('Ready!')
   client.connect()
+  db.get('channels').value().forEach(c => { ps.addTopic([channelTopic(c)]) })
 })
 
 bot.connect()

@@ -12,7 +12,8 @@
     "eris": "^0.8.1",
     "forever": "^0.15.3",
     "lowdb": "^1.0.0",
-    "tmi.js": "^1.2.1"
+    "tmi.js": "^1.2.1",
+    "twitchps": "^0.5.5"
   },
   "devDependencies": {
     "nodemon": "^1.12.1",
