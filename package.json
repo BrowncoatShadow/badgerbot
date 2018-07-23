@@ -3,23 +3,21 @@
   "main": "bot.js",
   "scripts": {
     "prestart": "npm install",
-    "start": "forever start $npm_package_main",
-    "stop": "forever stop $npm_package_main",
+    "start": "node $npm_package_main",
     "dev": "nodemon",
     "test": "standard --verbose | snazzy"
   },
   "dependencies": {
-    "dotenv": "^4.0.0",
-    "eris": "^0.8.1",
-    "forever": "^0.15.3",
-    "lowdb": "^1.0.0",
-    "tmi.js": "^1.2.1",
-    "twitchps": "^0.5.5"
+    "dotenv": "^6.0.0",
+    "eris": "latest",
+    "lowdb": "latest",
+    "tmi.js": "latest",
+    "twitchps": "latest"
   },
   "devDependencies": {
-    "nodemon": "^1.12.1",
-    "snazzy": "^7.0.0",
-    "standard": "^10.0.3"
+    "nodemon": "latest",
+    "snazzy": "latest",
+    "standard": "latest"
   },
   "nodemonConfig": {
     "ignore": [
