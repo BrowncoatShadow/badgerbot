@@ -73,14 +73,6 @@ ps.on('stream-down', (data) => {
     `#${data.channel_name} has stopped streaming.`)
 })
 
-client.on('join', (channel, user, self) => {
-  if (self) bot.createMessage(process.env.DISCORD_CHANNEL, `Joined ${channel}.`)
-})
-
-client.on('part', (channel, user, self) => {
-  if (self) bot.createMessage(process.env.DISCORD_CHANNEL, `Left ${channel}.`)
-})
-
 client.on('chat', (channel, user, message, self) => {
   bot.createMessage(process.env.DISCORD_CHANNEL,
     `[${channel}] <${user['display-name']}> ${message}`)
@@ -107,6 +99,7 @@ bot.registerCommand('join', (msg, args) => {
     client.join(chan).then(data => {
       ps.addTopic([channelTopic(chan)])
       db.get('channels').push(chan).write()
+      bot.createMessage(process.env.DISCORD_CHANNEL, `Joined ${chan}.`)
     }).catch(err => {
       bot.createMessage(process.env.DISCORD_CHANNEL, `${err}`)
     })
@@ -133,6 +126,7 @@ bot.registerCommand('part', (msg, args) => {
     client.part(chan).then(data => {
       ps.removeTopic([channelTopic(chan)])
       db.get('channels').remove(chan).write()
+      bot.createMessage(process.env.DISCORD_CHANNEL, `Left ${chan}.`)
     }).catch(err => {
       bot.createMessage(process.env.DISCORD_CHANNEL, `${err}`)
     })
