@@ -1,9 +1,10 @@
-require('dotenv').config()
+// require('dotenv').config()
 const Eris = require('eris')
 const tmi = require('tmi.js')
 const TwitchPS = require('twitchps')
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
+const path = require('path')
 
 // Return a sanitized version of a list of channel names.
 function sanitizeChannelList (arr) {
@@ -24,7 +25,8 @@ function channelTopic (chan) {
   return {topic: `video-playback.${chan.replace(/^#/g, '')}`}
 }
 
-const db = low(new FileSync('db.json'))
+var dataDir = process.env.BADGERBOT_DATADIR || '.'
+const db = low(new FileSync(path.resolve(dataDir, 'db.json')))
 db.defaults({ channels: [] }).write()
 
 // Main discord bot.
@@ -162,6 +164,10 @@ bot.registerCommand('purge', (msg, args) => {
       administrator: true
     }
   }
+})
+
+bot.on('debug', (msg, id) => {
+  if (process.env.NODE_ENV !== 'production') console.log(`Eris -- Debug -- ${msg}`)
 })
 
 bot.on('ready', () => {

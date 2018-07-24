@@ -2,26 +2,14 @@
   "private": true,
   "main": "bot.js",
   "scripts": {
-    "prestart": "npm install",
-    "start": "node $npm_package_main",
-    "dev": "nodemon",
-    "test": "standard --verbose | snazzy"
+    "prestart": "npm install --no-audit",
+    "start": "node $npm_package_main"
   },
   "dependencies": {
-    "dotenv": "^6.0.0",
+    "dotenv": "latest",
     "eris": "latest",
     "lowdb": "latest",
     "tmi.js": "latest",
     "twitchps": "latest"
-  },
-  "devDependencies": {
-    "nodemon": "latest",
-    "snazzy": "latest",
-    "standard": "latest"
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "db.json"
-    ]
   }
 }
